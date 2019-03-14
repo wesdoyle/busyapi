@@ -74,6 +74,11 @@ It's also saturating my CPU. These monitoring results are somewhat invalid - we'
 
     - We're logging to the console here, which doesn't make much sense in terms of performance for production, so I've removed it.
 
+    - If I have some time, I'll come back and replace the in-memory array with a mongodb client like `mongoose`
+
+- `6:35`: Looking at the Express server setup, I see a few minor changes we can make to try and tune performance a bit.
+    - We can use gzip compression.
+
 
 
 ### High-level thoughts about next-step implementations:
