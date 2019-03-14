@@ -13,7 +13,7 @@ export let options = {
     thresholds : {
         "http_req_duration": ["p(95)<100"], // 95th percentile all http request durations < 100ms
         "check_failure_rate": [
-            "rate<0.01" // global failure rates should be less than 1%
+            "rate<0.01", // global failure rates should be less than 1%
             { threshold: "rate<=0.05", abortOnFail: true },
         ]
     }
@@ -28,5 +28,5 @@ export default function() {
         "status is 201": (r) => r.status === 201
     });
 
-    failureRate.add(!checkRes);
+    failRate.add(!checkRes);
 };
