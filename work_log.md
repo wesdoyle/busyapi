@@ -67,6 +67,14 @@ It's also saturating my CPU. These monitoring results are somewhat invalid - we'
 
 - `6:12`: I'm going to start looking through the app for any low-hanging simple optimizations.
 
+- `6:20`: The first few things I notice on the usages route:
+    - We're just pushing a new `usageId` onto an array.  Clearly we'd implement some type of persistent storage here to
+      store data received from the request.  If the goal is to capture lots of reads very quickly, we could use document
+      storage / NoSQL like MongoDB or Cassandra for this purpose.
+
+    - We're logging to the console here, which doesn't make much sense in terms of performance for production, so I've removed it.
+
+
 
 ### High-level thoughts about next-step implementations:
 
