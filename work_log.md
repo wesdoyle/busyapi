@@ -2,14 +2,45 @@
 
 __Task__: Make the call POST `/api/usages` scale to 1M users per minute
 
-`5:36 PM`: When I'm thinking about scaling an API, I want to minimize client response time and
+- `5:36 PM`: When I'm thinking about scaling an API, I want to minimize client response time and
 maximize resource efficiency on the server side.
 
-Before I start making any changes to the existing code, I'll set up some basic local load testing
+- Before I start making any changes to the existing code, I'll set up some basic local load testing
 and metric collection to see initial performance of the API in its current state.
 
 - I have `k6` running locally in a Docker container, so I'll create a quick load testing script in a new directory.
 
+- `6:01 PM`: I've got a basic k6 config setup and can execute a load test using a shell script that just uses a k6 Docker container
+and tells it to look at the `loadtest.js` script, which defines some basic metrics and asserts we're getting `201` codes when we load up the server with POST requests.
+Here's the report:
+
+```
+    ✓ status is 201
+
+    time="2019-03-14T23:00:34Z" level=info msg="Test finished" i=8251 t=30.0016906s
+    ✓ check_failure_rate.........: 0.00%   ✓ 0    ✗ 8251
+    checks.....................: 100.00% ✓ 8251 ✗ 0
+    data_received..............: 1.8 MB  61 kB/s
+    data_sent..................: 2.1 MB  69 kB/s
+    http_req_blocked...........: avg=72.53µs  min=28.6µs  med=61.4µs  max=2.7ms   p(90)=100.3µs p(95)=139µs
+    http_req_connecting........: avg=85ns     min=0s      med=0s      max=704µs   p(90)=0s      p(95)=0s
+    ✓ http_req_duration..........: avg=2.19ms   min=270.1µs med=1.89ms  max=45.61ms p(90)=3.29ms  p(95)=3.91ms
+    http_req_receiving.........: avg=122.84µs min=26.1µs  med=106.1µs max=4.75ms  p(90)=195.4µs p(95)=246.6µs
+    http_req_sending...........: avg=88.76µs  min=21.5µs  med=69.6µs  max=1.99ms  p(90)=146µs   p(95)=186.25µs
+    http_req_tls_handshaking...: avg=0s       min=0s      med=0s      max=0s      p(90)=0s      p(95)=0s
+    http_req_waiting...........: avg=1.98ms   min=0s      med=1.69ms  max=45.4ms  p(90)=3ms     p(95)=3.58ms
+    http_reqs..................: 8251    275.017835/s
+    iteration_duration.........: avg=3.52ms   min=1.35ms  med=3.12ms  max=89.94ms p(90)=4.95ms  p(95)=5.66ms
+    iterations.................: 8251    275.017835/s
+    vus........................: 1       min=1  max=1
+    vus_max....................: 1       min=1  max=1
+```
+
+- Unfortunately, my laptop isn't going to be able to slam the API with 1M requests per minute, even though I've configured k6 to try and do so.
+Our server is health, and 95th percentile `http_req_duration` is 3.91ms. Not bad, but we're still pretty far from handling our target number of requests.
+I'm going to try and see if the package `load-test` can deliver more rps.
+
+> `loadtest http://localhost:3000/api/usages -T "application/json" -P '{"patientId":"100","timestamp":"Tue Nov 01 2016 09:11:51 GMT-0500 (CDT)","medication":"Albuterol"}' --rps 16700`
 
 
 ### High-level thoughts about next-step implementations:
