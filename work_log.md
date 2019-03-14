@@ -8,7 +8,7 @@ maximize resource efficiency on the server side.
 Before I start making any changes to the existing code, I'll set up some basic local load testing
 and metric collection to see initial performance of the API in its current state.
 
-- I have `k6` installed (`brew install k6 on osx`), so I'll create a quick load testing script in a new directory.
+- I have `k6` running locally in a Docker container, so I'll create a quick load testing script in a new directory.
 
 
 
