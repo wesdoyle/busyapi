@@ -38,9 +38,34 @@ Here's the report:
 
 - Unfortunately, my laptop isn't going to be able to slam the API with 1M requests per minute, even though I've configured k6 to try and do so.
 Our server is health, and 95th percentile `http_req_duration` is 3.91ms. Not bad, but we're still pretty far from handling our target number of requests.
-I'm going to try and see if the package `load-test` can deliver more rps.
+I'm going to try and see if the package `loadtest` can deliver more rps.
 
 > `loadtest http://localhost:3000/api/usages -T "application/json" -P '{"patientId":"100","timestamp":"Tue Nov 01 2016 09:11:51 GMT-0500 (CDT)","medication":"Albuterol"}' --rps 16700`
+
+- `6:07 PM`: Loadtest does eventually start to cause problems for our API.  From the loadtest output, we see mean latency start to climb, and eventually the express server becomes pretty unresponsive.
+It's also saturating my CPU. These monitoring results are somewhat invalid - we'd want the target application to be independent from the load testing machines in a true setup.
+
+```
+[Thu Mar 14 2019 18:05:45 GMT-0500 (Central Daylight Time)] INFO Requests: 0, requests per second: 0, mean latency: 0 ms
+[Thu Mar 14 2019 18:05:50 GMT-0500 (Central Daylight Time)] INFO Requests: 5069, requests per second: 1015, mean latency: 214.9 ms
+[Thu Mar 14 2019 18:05:55 GMT-0500 (Central Daylight Time)] INFO Requests: 10633, requests per second: 1113, mean latency: 2093.2 ms
+[Thu Mar 14 2019 18:06:00 GMT-0500 (Central Daylight Time)] INFO Requests: 15374, requests per second: 949, mean latency: 4557.7 ms
+[Thu Mar 14 2019 18:06:05 GMT-0500 (Central Daylight Time)] INFO Requests: 17889, requests per second: 484, mean latency: 6689.3 ms
+[Thu Mar 14 2019 18:06:10 GMT-0500 (Central Daylight Time)] INFO Requests: 19776, requests per second: 365, mean latency: 8791.3 ms
+[Thu Mar 14 2019 18:06:15 GMT-0500 (Central Daylight Time)] INFO Requests: 21643, requests per second: 380, mean latency: 12105.5 ms
+[Thu Mar 14 2019 18:06:15 GMT-0500 (Central Daylight Time)] INFO Errors: 8, accumulated errors: 8, 0% of total requests
+[Thu Mar 14 2019 18:06:20 GMT-0500 (Central Daylight Time)] INFO Requests: 23894, requests per second: 477, mean latency: 15629.3 ms
+[Thu Mar 14 2019 18:06:20 GMT-0500 (Central Daylight Time)] INFO Errors: 0, accumulated errors: 8, 0% of total requests
+[Thu Mar 14 2019 18:06:25 GMT-0500 (Central Daylight Time)] INFO Requests: 27719, requests per second: 763, mean latency: 18283.9 ms
+[Thu Mar 14 2019 18:06:25 GMT-0500 (Central Daylight Time)] INFO Errors: 74, accumulated errors: 82, 0.3% of total requests
+[Thu Mar 14 2019 18:06:30 GMT-0500 (Central Daylight Time)] INFO Requests: 29371, requests per second: 309, mean latency: 20696.8 ms
+[Thu Mar 14 2019 18:06:30 GMT-0500 (Central Daylight Time)] INFO Errors: 1472, accumulated errors: 1554, 5.3% of total requests
+[Thu Mar 14 2019 18:06:54 GMT-0500 (Central Daylight Time)] INFO Requests: 44551, requests per second: 636, mean latency: 32692.4 ms
+[Thu Mar 14 2019 18:06:54 GMT-0500 (Central Daylight Time)] INFO Errors: 15180, accumulated errors: 16734, 37.6% of total requests
+[Thu Mar 14 2019 18:06:56 GMT-0500 (Central Daylight Time)] INFO Requests: 47038, requests per second: 1189, mean latency: 50070.6 ms
+```
+
+- `6:12`: I'm going to start looking through the app for any low-hanging simple optimizations.
 
 
 ### High-level thoughts about next-step implementations:
