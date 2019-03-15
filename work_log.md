@@ -84,7 +84,7 @@ It's also saturating my CPU. These monitoring results are somewhat invalid - we'
 We wouldn't want to depend on a single instance of an app in production to handle tens of thousands of rps. I've heard of using PM2 for this, so I'm going
 to try and set up something simple as a proof-of-concept.
 
-- `7:10`: Running 4 instances of the api with bare-bones PM2 was a bit easier than expected:
+- `7:10`: Running 8 instances of the api with bare-bones PM2 was a bit easier than expected:
 
   - `pm2 start bin/www -i max`
 
