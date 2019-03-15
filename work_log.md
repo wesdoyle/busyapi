@@ -111,6 +111,16 @@ to try and set up something simple as a proof-of-concept.
   - It looks like PM2 also lets us monitor the instances from the terminal.
   - `pm2 monit` shows the requests coming in as I run the `k2` tests.
 
+- `7:30`: As I'm up against the time limit here, I'll describe a few thoughts about next steps.  The High-level notes below were written at the beginning of the project.
+
+  - Use a client like `mongoose` for data persistence in mongodb.  We can use a unique identifier for each saved object instead of `Array.length`
+  - Use HTTP/2 - looking at the inspector, we're using 1.1.  HTTP/2 supports multiple concurrent requests on a single TCP connection.
+  - Add Load balancer
+  - Cluster the web API - create a worker for each CPU (and possibly fork() when one dies)
+  - Set up an appropriate separate monitoring system with the app running on a production server
+  - Set up load testing machine(s) to deliver the 1M rpm in a stable manner
+  - Aggregate structured production logs
+
 
 
 ### High-level thoughts about next-step implementations:
