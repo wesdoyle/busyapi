@@ -77,7 +77,39 @@ It's also saturating my CPU. These monitoring results are somewhat invalid - we'
     - If I have some time, I'll come back and replace the in-memory array with a mongodb client like `mongoose`
 
 - `6:35`: Looking at the Express server setup, I see a few minor changes we can make to try and tune performance a bit.
-    - We can use gzip compression.
+    - We can use gzip compression. The `compression` middleware will attempt to compress all response bodies for requests.
+      This might give us a bigger gain in other use cases, where response body size is more significant.
+
+- `7:00`: I'm now thinking about implementing some kind of basic service management so that we can run multiple instances of the app to provide concurrency.
+We wouldn't want to depend on a single instance of an app in production to handle tens of thousands of rps. I've heard of using PM2 for this, so I'm going
+to try and set up something simple as a proof-of-concept.
+
+- `7:10`: Running 4 instances of the api with bare-bones PM2 was a bit easier than expected:
+
+  - `pm2 start bin/www -i max`
+
+  > Starting the app using max number of CPUs
+
+```
+  [PM2] Spawning PM2 daemon with pm2_home=/Users/wes/.pmyapi [master] ⚡  pm2 start bin/www -i max
+  [PM2] Starting /Users/wes/projects/busyapi/bin/www in cluster_mode (0 instance)
+  [PM2] Done.
+  ┌──────────┬────┬─────────┬─────────┬───────┬────────┬─────────┬────────┬─────┬───────────┬──────┬──────────┐
+  │ App name │ id │ version │ mode    │ pid   │ status │ restart │ uptime │ cpu │ mem       │ user │ watching │
+  ├──────────┼────┼─────────┼─────────┼───────┼────────┼─────────┼────────┼─────┼───────────┼──────┼──────────┤
+  │ www      │ 0  │ 0.0.0   │ cluster │ 79119 │ online │ 0       │ 0s     │ 0%  │ 46.0 MB   │ wes  │ disabled │
+  │ www      │ 1  │ 0.0.0   │ cluster │ 79120 │ online │ 0       │ 0s     │ 0%  │ 45.7 MB   │ wes  │ disabled │
+  │ www      │ 2  │ 0.0.0   │ cluster │ 79127 │ online │ 0       │ 0s     │ 0%  │ 45.6 MB   │ wes  │ disabled │
+  │ www      │ 3  │ 0.0.0   │ cluster │ 79132 │ online │ 0       │ 0s     │ 0%  │ 45.7 MB   │ wes  │ disabled │
+  │ www      │ 4  │ 0.0.0   │ cluster │ 79137 │ online │ 0       │ 0s     │ 0%  │ 41.6 MB   │ wes  │ disabled │
+  │ www      │ 5  │ 0.0.0   │ cluster │ 79142 │ online │ 0       │ 0s     │ 0%  │ 38.4 MB   │ wes  │ disabled │
+  │ www      │ 6  │ 0.0.0   │ cluster │ 79147 │ online │ 0       │ 0s     │ 0%  │ 29.0 MB   │ wes  │ disabled │
+  │ www      │ 7  │ 0.0.0   │ cluster │ 79152 │ online │ 0       │ 0s     │ 0%  │ 20.8 MB   │ wes  │ disabled │
+  └──────────┴────┴─────────┴─────────┴───────┴────────┴─────────┴────────┴─────┴───────────┴──────┴──────────┘
+```
+
+  - It looks like PM2 also lets us monitor the instances from the terminal.
+  - `pm2 monit` shows the requests coming in as I run the `k2` tests.
 
 
 
