@@ -109,7 +109,7 @@ to try and set up something simple as a proof-of-concept.
 ```
 
   - It looks like PM2 also lets us monitor the instances from the terminal.
-  - `pm2 monit` shows the requests coming in as I run the `k2` tests.
+  - `pm2 monit` shows the requests coming in as I run the `k6` tests.
 
 - `7:30`: As I'm up against the time limit here, I'll describe a few thoughts about next steps.  The High-level notes below were written at the beginning of the project.
 
